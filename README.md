@@ -72,6 +72,7 @@ lxc.idmap = g 0 200000 65536
 now, you may go to `~lxcuser/.local/share/lxc/newcontainer/config` and replace with the desired values:
 
 eg.
+
 ```
 # IDMAP config...
 lxc.idmap = u 0 300000 65536
@@ -93,3 +94,7 @@ now, you may repwn the files with the following command (**as root**):
  
  - Both subuid/subgid range should start in the same number, so if, for some reason, the start uid/gid number mismatch, don't continue with this tool as is, modify it! ;-)
  - The user (eg. lxcuser) should have enough subuid/subgid space to handle the new UID/GID addresses. check this in `/etc/subuid` and `/etc/subgid`
+
+ ## Compatibility
+
+ For extending the compatibility to older OS's (like RHEL7), I decided to use C++11 with boost libraries instead of using C++17 wich also have the filesystem required functions.
