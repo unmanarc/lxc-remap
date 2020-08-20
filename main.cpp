@@ -29,6 +29,8 @@ int main(int argc, char * argv[])
     if (argc != 6)
     {
         printf("Usage: %s [cur_subxid_start] [cur_subxid_max] [new_subxid_start] [new_subxid_max] [rootfspath]\n", argv[0]);
+        printf("Author: Aaron Mizrachi <aaron@unmanarc.com>\n");
+        printf("License: LGPLv3\n");
         return -1;
     }
 
