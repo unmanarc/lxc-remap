@@ -15,35 +15,28 @@ When you use `lxc-copy`, rootfs files are copied with the same uid-gid range, so
 
 This may improve your LXC security and reduce chances of pivoting, specially if somebody escaped one untrusted container.
 
+ ## Build Pre-requisites
+
+You will need to install (eg. for ubuntu 20.04):
+
+```
+apt install cmake libboost-filesystem1.71-dev build-essential
+```
+
+You may use other versions of libboost, so just modify the 1.71 version for your OS provided one, and modify apt for yum if you are in fedora/centos
+
  ## How to build
 
 Basically you have to execute this in our project dir:
 
 ```
-cmake .
-make
+cmake -DCMAKE_INSTALL_PREFIX=/ .
+make install
 ```
 
 eg.
 ```
-$ cmake .
--- The CXX compiler identification is GNU 9.3.0
--- Check for working CXX compiler: /usr/bin/c++
--- Check for working CXX compiler: /usr/bin/c++ -- works
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.71.0/BoostConfig.cmake (found suitable version "1.71.0", minimum required is "1.45.0") found components: filesystem regex 
--- Configuring done
--- Generating done
--- Build files have been written to: /home/user/Projects/lxc-remap
 
-$ make
-Scanning dependencies of target lxc-remap
-[ 50%] Building CXX object CMakeFiles/lxc-remap.dir/main.cpp.o
-[100%] Linking CXX executable lxc-remap
-[100%] Built target lxc-remap
 ```
 
 
