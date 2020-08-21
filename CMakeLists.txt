@@ -16,3 +16,4 @@ if(Boost_FOUND)
 endif()
 
 
+install(TARGETS lxc-remap RUNTIME DESTINATION ${CMAKE_INSTALL_SBINDIR})

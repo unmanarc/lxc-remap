@@ -1,3 +1,20 @@
+/*
+ * lxc-remap : Rewrite LXC SUB UID/GID Maps.
+ * Copyright (C) 2020 Aaron Mizrachi <aaron@unmanarc.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation Version 3
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdio.h>
 #include <filesystem>
 #include <boost/filesystem.hpp>
@@ -28,9 +45,10 @@ int main(int argc, char * argv[])
 
     if (argc != 6)
     {
-        printf("Usage: %s [cur_subxid_start] [cur_subxid_max] [new_subxid_start] [new_subxid_max] [rootfspath]\n", argv[0]);
+        printf("Usage: %s [cur_subxid_start] [cur_subxid_max] [new_subxid_start] [new_subxid_max] [rootfs_path]\n", argv[0]);
         printf("Author: Aaron Mizrachi <aaron@unmanarc.com>\n");
         printf("License: LGPLv3\n");
+        printf("Version: 0.1a\n");
         return -1;
     }
 
@@ -45,6 +63,19 @@ int main(int argc, char * argv[])
            cur_space_max,
            new_space_start,
            new_space_max);
+
+    if (getuid()!=0)
+    {
+        printf("ERR: This program should be executed with UID=0 (root). Aborting...\n");
+        return -5;
+    }
+    if (access(argv[5],W_OK))
+    {
+        printf("ERR: Rootfs path is not a valid writteable location. Aborting...\n");
+        return -4;
+    }
+
+    printf("Changing owner of base dir [%s] - %d\n",argv[5], printf("%d\n", fchownat(AT_FDCWD,argv[5], new_space_start, new_space_start, AT_SYMLINK_FOLLOW)));
 
     for(auto& p: fs::recursive_directory_iterator(argv[5]))
     {
