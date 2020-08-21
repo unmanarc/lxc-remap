@@ -34,12 +34,6 @@ cmake -DCMAKE_INSTALL_PREFIX=/ .
 make install
 ```
 
-eg.
-```
-
-```
-
-
  ## Usage:
 
 ```
