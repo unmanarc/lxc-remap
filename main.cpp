@@ -75,7 +75,7 @@ int main(int argc, char * argv[])
         return -4;
     }
 
-    printf("Changing owner of base dir [%s] - %d\n",argv[5], printf("%d\n", fchownat(AT_FDCWD,argv[5], new_space_start, new_space_start, AT_SYMLINK_FOLLOW)));
+    printf("Changing owner of base dir [%s] - %d\n",argv[5], fchownat(AT_FDCWD,argv[5], new_space_start, new_space_start, AT_SYMLINK_NOFOLLOW));
 
     for(auto& p: fs::recursive_directory_iterator(argv[5]))
     {
