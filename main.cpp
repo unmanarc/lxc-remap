@@ -48,7 +48,7 @@ int main(int argc, char * argv[])
         printf("Usage: %s [cur_subxid_start] [cur_subxid_max] [new_subxid_start] [new_subxid_max] [rootfs_path]\n", argv[0]);
         printf("Author: Aaron Mizrachi <aaron@unmanarc.com>\n");
         printf("License: LGPLv3\n");
-        printf("Version: 0.1a\n");
+        printf("Version: 0.2a\n");
         return -1;
     }
 
@@ -98,7 +98,9 @@ int main(int argc, char * argv[])
                 fprintf(stderr,"\nERR: File exceed the %u limit, aborting!\n", new_space_max);
                 return -2;
             }
-            printf("%d\n", fchownat(AT_FDCWD, p.path().c_str(), newuid, newgid, AT_SYMLINK_NOFOLLOW));
+            printf("CHOWN: %d, ", fchownat(AT_FDCWD, p.path().c_str(), newuid, newgid, AT_SYMLINK_NOFOLLOW));
+            // Restore previous mode (chown sometimes removed the setuid).
+            printf("CHMOD: %d\n", fchmodat(AT_FDCWD, p.path().c_str(), info.st_mode, AT_SYMLINK_NOFOLLOW));
         }
         else
         {
