@@ -27,15 +27,15 @@
 namespace fs = boost::filesystem;
 
 
-std::string getFileTypeStr( struct stat stbuf )
+std::string getFileTypeStr( struct stat info )
 {
-    if (S_ISDIR(stbuf.st_mode)) return "Directory";
-    else if (S_ISLNK(stbuf.st_mode)) return "Symbolic Link";
-    else if (S_ISREG(stbuf.st_mode)) return "Regular File";
-    else if (S_ISBLK(stbuf.st_mode)) return "Block Device";
-    else if (S_ISCHR(stbuf.st_mode)) return "Character Device";
-    else if (S_ISFIFO(stbuf.st_mode)) return "Fifo File";
-    else if (S_ISSOCK(stbuf.st_mode)) return "Socket File";
+    if (S_ISDIR(info.st_mode)) return "Directory";
+    else if (S_ISLNK(info.st_mode)) return "Symbolic Link";
+    else if (S_ISREG(info.st_mode)) return "Regular File";
+    else if (S_ISBLK(info.st_mode)) return "Block Device";
+    else if (S_ISCHR(info.st_mode)) return "Character Device";
+    else if (S_ISFIFO(info.st_mode)) return "Fifo File";
+    else if (S_ISSOCK(info.st_mode)) return "Socket File";
 
     return "Unknown File";
 }
@@ -98,9 +98,13 @@ int main(int argc, char * argv[])
                 fprintf(stderr,"\nERR: File exceed the %u limit, aborting!\n", new_space_max);
                 return -2;
             }
-            printf("CHOWN: %d, ", fchownat(AT_FDCWD, p.path().c_str(), newuid, newgid, AT_SYMLINK_NOFOLLOW));
-            // Restore previous mode (chown sometimes removed the setuid).
-            printf("CHMOD: %d\n", fchmodat(AT_FDCWD, p.path().c_str(), info.st_mode, AT_SYMLINK_NOFOLLOW));
+            printf("CHOWN(%d,%d): %d, ",newuid,newgid, fchownat(AT_FDCWD, p.path().c_str(), newuid, newgid, AT_SYMLINK_NOFOLLOW));
+
+            // Restore previous mode on non-links with special attribs... (chown sometimes removed the setuid).
+            if (!S_ISLNK(info.st_mode) && info.st_mode>999)
+                printf("CHMOD(%d): %d\n",info.st_mode, fchmodat(AT_FDCWD, p.path().c_str(), info.st_mode, 0));
+            else
+                printf("CHMOD(%d): NOT REQ.\n",info.st_mode);
         }
         else
         {
