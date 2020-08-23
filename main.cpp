@@ -40,6 +40,20 @@ std::string getFileTypeStr( struct stat info )
     return "Unknown File";
 }
 
+int toOctal(int d)
+{
+    int oct=0, i=1;
+
+    while (d)
+    {
+        oct+=(d%8)*i;
+        i*=10;
+        d/=8;
+    }
+
+    return oct;
+}
+
 int main(int argc, char * argv[])
 {
 
@@ -98,13 +112,14 @@ int main(int argc, char * argv[])
                 fprintf(stderr,"\nERR: File exceed the %u limit, aborting!\n", new_space_max);
                 return -2;
             }
+
             printf("CHOWN(%d,%d): %d, ",newuid,newgid, fchownat(AT_FDCWD, p.path().c_str(), newuid, newgid, AT_SYMLINK_NOFOLLOW));
 
             // Restore previous mode on non-links with special attribs... (chown sometimes removed the setuid).
-            if (!S_ISLNK(info.st_mode) && info.st_mode>999)
-                printf("CHMOD(%d): %d\n",info.st_mode, fchmodat(AT_FDCWD, p.path().c_str(), info.st_mode, 0));
+            if (!S_ISLNK(info.st_mode) && (S_ISUID&info.st_mode || S_ISGID&info.st_mode || S_ISVTX&info.st_mode ))
+                printf("CHMOD(%d): %d\n",toOctal(info.st_mode), fchmodat(AT_FDCWD, p.path().c_str(), info.st_mode, 0));
             else
-                printf("CHMOD(%d): NOT REQ.\n",info.st_mode);
+                printf("CHMOD(%d): NOT REQ.\n",toOctal(info.st_mode));
         }
         else
         {
