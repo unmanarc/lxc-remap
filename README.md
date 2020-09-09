@@ -23,7 +23,13 @@ You will need to install (eg. for ubuntu 20.04):
 apt install cmake libboost-filesystem1.71-dev build-essential
 ```
 
-You may use other versions of libboost, so just modify the 1.71 version for your OS provided one, and modify apt for yum if you are in fedora/centos
+Or for ubuntu 18.04:
+
+```
+apt install cmake libboost-filesystem1.65-dev build-essential
+```
+
+You may use other versions of libboost, so just modify the 1.71/1.65 version for your OS provided one, and modify apt for yum if you are in fedora/centos
 
  ## How to build
 
@@ -37,26 +43,23 @@ make install
  ## Usage:
 
 ```
-$ ./lxc-remap 
-Usage: ./lxc-remap [cur_subxid_start] [cur_subxid_max] [new_subxid_start] [new_subxid_max] [rootfspath]
+# lxc-remap 
+Usage: 
+Manual Mode: lxc-remap [cur_subxid_start] [cur_subxid_max] [new_subxid_start] [new_subxid_max] [dir_path]
+  Auto Mode: lxc-remap [lxc_dir_path] # < Requires lxc_dir_path/config
+
+Author: Aaron Mizrachi <aaron@unmanarc.com>
+License: LGPLv3
+Version: 0.3a
 ```
 
 The first thing you should do is to copy the container:
 
 `lxc-copy -n basecontainer -N newcontainer`
 
-And.. After copying a container, you should identify the source subuid/subgid range and the target subuid/subgid range.
+And.. After copying a container, you should identify/edit the target subuid/subgid.
 
-You can do this by looking in `~lxcuser/.local/share/lxc/basecontainer/config` :
-
-eg.
-```
-# IDMAP config...
-lxc.idmap = u 0 200000 65536
-lxc.idmap = g 0 200000 65536
-```
-
-now, you may go to `~lxcuser/.local/share/lxc/newcontainer/config` and replace with the desired values:
+You can do this by modifiying `~lxcuser/.local/share/lxc/newcontainer/config` :
 
 eg.
 
@@ -70,8 +73,25 @@ now, you may repwn the files with the following command (**as root**):
 
 
 ```
-# ./lxc-remap 200000 265535 300000 365535 ~lxcuser/.local/share/lxc/newcontainer/rootfs
-# chown 300000:300000 ~lxcuser/.local/share/lxc/newcontainer
+# ./lxc-remap /home/lxcuser/.local/share/lxc/newcontainer
+```
+
+
+The Auto Mode will read the config/env values:
+
+```
+[+] Auto Config [rootfs]: /home/lxcuser/.local/share/lxc/newcontainer/rootfs
+[+] Auto Config [(ug)id_transforms]: current(0->65536), new(300000->365536)
+[+] Current LXC Path: /home/lxcuser/.local/share/lxc/newcontainer
+[+] Parent LXC Path: /home/lxcuser/.local/share/lxc, (uid:1000, gid:1000)
+ [-] Changing ownership of config [/home/lxcuser/.local/share/lxc/newcontainer/config] (to uid:1000,gid:1000) - 0
+ [-] Changing ownership of LXC dir [/home/lxcuser/.local/share/lxc/newcontainer] (to uid:300000,gid:1000) - 0
+  [-] Transforming Directory [/home/lxcuser/.local/share/lxc/newcontainer/rootfs], [uid:300000:gid:300000]->[uid:300000:gid:300000] - CHOWN(300000,300000): 0, CHMOD(40555): NOT REQ.
+ [-] Transforming Directory [/home/lxcuser/.local/share/lxc/newcontainer/rootfs/run], [uid:300000:gid:300000]->[uid:300000:gid:300000] - CHOWN(300000,300000): 0, CHMOD(40755): NOT REQ.
+
+ .
+ .
+ .
 ```
 
 **don't forget to adapt the previous commands to your requirements!**
