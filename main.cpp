@@ -153,6 +153,17 @@ int main(int argc, char * argv[])
             return -9;
         }
 
+        char * cFullLXCPath;
+
+        // Check Server Dir Real Path:
+        if ((cFullLXCPath=realpath(lxcDir.c_str(), nullptr))==nullptr)
+        {
+            fprintf(stderr,"ERR: failed to get the real path of %s\n", lxcDir.c_str());
+            return -9;
+        }
+
+        lxcDir = cFullLXCPath;
+
         string configFile = lxcDir + "/config";
         if (access( configFile.c_str(), W_OK ))
         {
